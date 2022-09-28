@@ -82,14 +82,14 @@ AT_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=10gb --time=12:00:00 --mail-type=
 
 #	Either a text file containing a list of samples to trim (if PE, only need to list the forward reads) including the full file path, 
 #	OR a directory of input files
-AT_INPUT=""
+AT_INPUT="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate1/FASTQ_Generation_2018-12-13_14_45_49Z-143224094"
 
 #   Where do you want the Trimmed Samples to go?
 #       Include the full file path, e.g. path/to/directory (with no trailing forward slash)
-AT_OUTPUTDIR=""
+AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate1/FASTQ_Generation_2018-12-13_14_45_49Z-143224094"
 
 #	What is our adapter file? Include the full file path.
-ADAPTERFILE=""
+ADAPTERFILE="/scratch/ely67071/sunflower_data/illumina_adapters.txt"
 
 #   What shared suffix do the forward samples have?
 #       Example: _1_sequence.txt.gz
