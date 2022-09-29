@@ -7,6 +7,9 @@ module load Trimmomatic/0.39-Java-1.8.0_144 > /dev/null 2>&1
 # arrayID (minimum for slurm is zero)
 if [[ "${QUEUE}" == "Slurm" ]]; then
 	PBS_ARRAYID=$((SLURM_ARRAY_TASK_ID+1))
+
+        # write Job IDs to a text file that will be used to keep track of exit codes
+        echo "${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}" >> ${JOB_LOG}
 	echo "Processing array ${SLURM_ARRAY_TASK_ID} corresponding to line/file # ${PBS_ARRAYID}"
 else
 	echo "Processing array ${PBS_ARRAYID} through PBS queuing system"

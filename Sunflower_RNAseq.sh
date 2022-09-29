@@ -64,7 +64,7 @@ case "${ROUTINE}" in
             echo "Slurm is our workload manager/job scheduler."
             Slurm_Maxarray=$(($Maxarray-1))
             sbatch --job-name=${PROJECT}_Adapter_Trimming ${AT_SBATCH} --output=${ERROR}/AT_slurm_%A_%a.out --array=0-${Slurm_Maxarray} \
-            --export=QUEUE=${QUEUE},AT_INPUT=${AT_INPUT},AT_OUTPUTDIR=${AT_OUTPUTDIR},ADAPTERFILE=${ADAPTERFILE},FORWARD_NAMING=${FORWARD_NAMING},REVERSE_NAMING=${REVERSE_NAMING},SEEDMISMATCH=${SEEDMISMATCH},PALINDROMECLIP=${PALINDROMECLIP},SIMPLECLIP=${SIMPLECLIP},MINADAPTERLEN=${MINADAPTERLEN},KEEPREADS=${KEEPREADS},LEADCUT=${LEADCUT},TRAILCUT=${TRAILCUT},MINLENGTH=${MINLENGTH},PE=${PE} ${SUNFLOWER_RNASEQ}/Trimm.sh
+            --export=QUEUE=${QUEUE},JOB_LOG=${JOB_LOG},AT_INPUT=${AT_INPUT},AT_OUTPUTDIR=${AT_OUTPUTDIR},ADAPTERFILE=${ADAPTERFILE},FORWARD_NAMING=${FORWARD_NAMING},REVERSE_NAMING=${REVERSE_NAMING},SEEDMISMATCH=${SEEDMISMATCH},PALINDROMECLIP=${PALINDROMECLIP},SIMPLECLIP=${SIMPLECLIP},MINADAPTERLEN=${MINADAPTERLEN},KEEPREADS=${KEEPREADS},LEADCUT=${LEADCUT},TRAILCUT=${TRAILCUT},MINLENGTH=${MINLENGTH},PE=${PE} ${SUNFLOWER_RNASEQ}/Trimm.sh
         else
                     echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
                     exit 1
