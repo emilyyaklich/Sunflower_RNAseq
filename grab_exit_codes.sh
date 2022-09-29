@@ -18,17 +18,19 @@
 LOG_FILE="/scratch/ely67071/sunflower_data/AT_job_log.txt"
 # name the output file that will contain the exit codes
 EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/AT_exit_codes.txt"
+NON_ZERO_EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/AT_non_zero_exit_codes.txt"
+
 lines=$(cat $LOG_FILE)
 
 # loop through each JOB ID and record the exit code 
-# additionally, check if 0:0 is not in the sacct output and write that to the output file
+# additionally, check if 0:0 is not in the sacct output
 for line in $lines
 do
     exit_code=$(sacct -X -n --jobs $line)
     echo "${exit_code}" >> ${EXIT_CODE_FILE}
     
     # write to the job output file if any jobs have non-zero exit codes
-    if [[ ${exit_code} != *"0:0"* ]];then echo "Job ID $line has non-zero Exit code"
+    if [[ ${exit_code} != *"0:0"* ]];then echo "Job ID $line has non-zero Exit code" >>${NON_ZERO_EXIT_CODE_FILE}
 fi
  
 

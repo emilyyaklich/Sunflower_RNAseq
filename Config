@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   Name this project
-PROJECT="RNA"
+PROJECT="RNA_sunflower"
 
 #   What email should we use for job notifications?
 EMAIL="ely67071@uga.edu"
@@ -82,11 +82,11 @@ AT_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=13gb --time=12:00:00 --mail-type=
 
 #	Either a text file containing a list of samples to trim (if PE, only need to list the forward reads) including the full file path, 
 #	OR a directory of input files
-AT_INPUT="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate1/FASTQ_Generation_2018-12-13_14_45_49Z-143224094"
+AT_INPUT="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate1/FASTQ_Generation_2019-03-30_14_49_16Z-171366363"
 
 #   Where do you want the Trimmed Samples to go?
 #       Include the full file path, e.g. path/to/directory (with no trailing forward slash)
-AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate1/FASTQ_Generation_2018-12-13_14_45_49Z-143224094"
+AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate1/FASTQ_Generation_2019-03-30_14_49_16Z-171366363"
 
 #	What is our adapter file? Include the full file path.
 ADAPTERFILE="/scratch/ely67071/sunflower_data/illumina_adapters.txt"
