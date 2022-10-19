@@ -26,12 +26,12 @@ ANNOTATION_FORMAT="GFF3"
 #   Where is the Genome Annotation file (GFF3 or GTF)?
 #   Include the full filepath
 #	This variable will be used in the 'Genome Index' and 'Reference Prep' steps
-GEN_ANN=""
+GEN_ANN="/scratch/ely67071/sunflower_data/genomes/H_argophyllus/20210824_Harg2202r1.0-20210824_FunctionalAnnotation/annotation/Harg2202r1.0-20210824.gff3"
 
 #   Where is the Genome FASTA file?
 #	Include the full filepath
 #	This variable will be used in the 'Genome Index' and 'Reference Prep' steps
-GEN_FASTA=""
+GEN_FASTA="/scratch/ely67071/sunflower_data/genomes/H_argophyllus/20210824_Harg2202r1.0-20210824_FunctionalAnnotation/fasta/Harg2202r1.0-20210824.genome.fasta"
 
 ############################################
 ##########   Quality_Assessment   ##########
@@ -53,11 +53,11 @@ SUFFIX=".fastq.gz"
 #	Where is the directory containing your data to be assessed? 
 #	This can be a directory to multiple directories each containing a forward and reverse read which is the format of raw data from the GGBC
 #       Include the full file path, e.g. path/to/directory (with no trailing forward slash)
-QA_INPUTDIR="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate1/test"
+QA_INPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate1"
 
 #   Where do you want the FastQC results?
 #       Include the full file path, e.g. path/to/directory (with no trailing forward slash)
-QA_OUTPUTDIR="/scratch/ely67071/sunflower_data/rna_fastqc/test"
+QA_OUTPUTDIR="/scratch/ely67071/sunflower_data/rna_fastqc/rna_fastqc_post_AT/Plate1"
 
 #	A place for FASTQC to store temporary files
 QA_TEMP="/scratch/ely67071/temp"
@@ -82,17 +82,17 @@ AT_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=13gb --time=12:00:00 --mail-type=
 
 #	Either a text file containing a list of samples to trim (if PE, only need to list the forward reads) including the full file path, 
 #	OR a directory of input files
-AT_INPUT="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate1/FASTQ_Generation_2019-03-30_14_49_16Z-171366363"
+AT_INPUT="/scratch/ely67071/sunflower_data/raw_rna_seq/Plate3/Run4/FASTQ_Generation_2019-06-18_11_33_02Z-188373107"
 
 #   Where do you want the Trimmed Samples to go?
 #       Include the full file path, e.g. path/to/directory (with no trailing forward slash)
-AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate1/FASTQ_Generation_2019-03-30_14_49_16Z-171366363"
+AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate3/Run4/FASTQ_Generation_2019-06-18_11_33_02Z-188373107"
 
 #	What is our adapter file? Include the full file path.
 ADAPTERFILE="/scratch/ely67071/sunflower_data/illumina_adapters.txt"
 
 #       File name/path of where JOB IDs should be recorded
-JOB_LOG="/scratch/ely67071/sunflower_data/AT_job_log.txt"
+AT_JOB_LOG="/scratch/ely67071/sunflower_data/AT_job_log.txt"
 
 #   What shared suffix do the forward samples have?
 #       Example: _1_sequence.txt.gz
@@ -150,6 +150,12 @@ MINLENGTH=20
 #   Below are the recommended settings
 GI_QSUB="mem=50gb,nodes=1:ppn=4,walltime=450:00:00"
 
+
+#   QUEUE=Slurm: What are our sbatch settings?
+#       Below are the recommended settings
+PARTITION="batch"
+GI_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=80gb --time=168:00:00 --mail-type=BEGIN,END,FAIL --mail-user=${EMAIL} --partition=${PARTITION}"
+
 #	Define the number of threads to be used. 
 #	This must be set to the number of available cores on the server node
 NTHREAD=4
@@ -158,7 +164,7 @@ NTHREAD=4
 #	This direcotry has to be created before program will run and needs writing permissions
 #	This directory path will also be used in the next read mapping step
 #	Include the full filepath
-GEN_DIR=""
+GEN_DIR="/scratch/ely67071/sunflower_data/genomes/genome_indicies/H_argophyllus"
 
 #   Specify the length of genomic sequence to be used in constructing the splice junctions database.
 #   This length should be equal to ReadLength-1, where ReadLength is the length of reads
@@ -170,7 +176,7 @@ SPLICE_JUN=74
 #										2.) you want GeneCounts output from read mapping
 #	(The tag name used for transcript-parents for a .gff3 file is 'Parent')
 #	This variable will be ignored if annotation file is GTF format
-GENE_PARENT=""
+GENE_PARENT="Parent"
 
 ############################################
 ########    Collect_Junctions        #######
@@ -183,7 +189,9 @@ GENE_PARENT=""
 ###### IMPORTANT: This step shares variables with Read-Mapping (below)
 
 #   Where do you want your output files to go? Include the full file path
-CJ_OUTPUTDIR=""
+CJ_OUTPUTDIR="/scratch/ely67071/sunflower_data/STAR_output/junction_data"
+#       File name/path of where JOB IDs should be recorded
+CJ_JOB_LOG="/scratch/ely67071/sunflower_data/CJ_job_log.txt"
 
 ############################################
 ########    Filter_Junctions        ########
@@ -196,12 +204,19 @@ CJ_OUTPUTDIR=""
 #	Below are the recommended settings
 FJ_QSUB="mem=22gb,nodes=1:ppn=4,walltime=4:00:00"
 
+
+#   QUEUE=Slurm: What are our sbatch settings?
+#       Below are the recommended settings
+PARTITION="batch"
+FJ_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=22gb --time=04:00:00 --mail-type=BEGIN,END,FAIL --mail-user=${EMAIL} --partition=${PARTITION}"
+
+
 #	Where are the "SJ.out.tab" files? Include the full filepath
 #	This will also be where the concatenated filtered list is put
-JUNCTIONDIR=""
+JUNCTIONDIR="/scratch/ely67071/sunflower_data/STAR_output/junction_data"
 
 #	Name of final list (will end in SJ.filtered.tab)
-SJ_LISTNAME=""
+SJ_LISTNAME="ha412_"
 
 ## FILTERS:
 
@@ -229,9 +244,17 @@ UNIQUE_NUM=2
 #	Note that STAR needs at least 30gb of memory to run
 RM_QSUB="mem=50gb,nodes=1:ppn=16,walltime=450:00:00"
 
+#   QUEUE=Slurm: What are our sbatch settings?
+#       Below are the recommended settings
+RM_PARTITION="batch"
+RM_SBATCH="--nodes=1 --ntasks-per-node=16 --mem=50gb --time=45:00:00 --partition=${PARTITION}"
+
+
 #   Where are the trimmed files? This handler will accept EITHER a text file list of forward samples to map (include the full file path for each sample) OR
 #	a directory of input files (include the full file path). This may be the same as your output directory defined in adapter trimming (AT_OUTPUTDIR)
-RM_INPUT=""
+RM_INPUT="/scratch/ely67071/sunflower_data/trimmed_reads/Plate3/Run4/FASTQ_Generation_2019-06-18_11_33_02Z-188373107"
+#       File name/path of where JOB IDs should be recorded
+RM_JOB_LOG="/scratch/ely67071/sunflower_data/RM_job_log_2nd_pass.txt"
 
 #   What shared suffix do the forward samples have?
 #       Example: _R1_paired.fq.gz
@@ -242,7 +265,7 @@ FORWARD="_R1_paired.fq.gz"
 REVERSE="_R2_paired.fq.gz"
 
 #   Where do you want your output files to go? Include the full file path
-RM_OUTPUTDIR=""
+RM_OUTPUTDIR="/scratch/ely67071/sunflower_data/STAR_output/Plate3/Run4/FASTQ_Generation_2019-06-18_11_33_02Z-188373107"
 
 #	Define the number of threads to be used. 
 #	This must be set to the number of available cores on the server node
@@ -277,7 +300,7 @@ SEEDSEARCH=50
 #	This information is useful for differentiating reads coming from different runs/lanes even after merging
 
 #	Name of Flowcell (or other name that differentiates a particular run, e.g. "Run1")
-FLOWCELL_NAME=""
+FLOWCELL_NAME="Run4"
 
 # sequencing platform used
 PLATFORM="ILLUMINA"
@@ -294,7 +317,7 @@ GENOMIC_COORDINATE_BAMSORTED="no"
 #	Either "TranscriptomeSAM" -outputs SAM/BAM alignments to transcriptome in a separate file
 #	Or "GeneCounts" - read counts per gene
 #	Can also put "-" for none
-QUANT=TranscriptomeSAM
+QUANT=GeneCounts
 
 #	2nd-pass read mapping will use junctions discovered in the first pass (Collect_Junctions)
 #	This variable can be one of two options:
@@ -302,7 +325,7 @@ QUANT=TranscriptomeSAM
 #		2.) If you have more than one filtered junction list (if Collect_Junctions was run with multiple sample groups),
 #			this variable can be a text file listing the full file paths for each junction file you want included	
 #	If not using additional junctions, leave blank
-FILTERED_JUNC_LIST=""
+FILTERED_JUNC_LIST="/scratch/ely67071/sunflower_data/STAR_output/junction_data/ha412__SJ.filtered.tab"
 
 ############################################
 ##############    Merge_BAM   ##############

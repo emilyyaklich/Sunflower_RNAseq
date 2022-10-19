@@ -10,15 +10,11 @@
 #SBATCH --mail-user=ely67071@uga.edu
 #SBATCH --mail-type=ALL
 
-# AUTHOR: ELY
-# DATE: 09-29-2022
-
-
 # read in the file where all JOBs and task IDs were recorded (output from Adapter Trimming section of pipeline; Trimm.sh)
-LOG_FILE="/scratch/ely67071/sunflower_data/AT_job_log.txt"
+LOG_FILE="/scratch/ely67071/sunflower_data/RM_job_log_2nd_pass.txt"
 # name the output file that will contain the exit codes
-EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/AT_exit_codes.txt"
-NON_ZERO_EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/AT_non_zero_exit_codes.txt"
+EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/RM_exit_codes.txt"
+NON_ZERO_EXIT_CODE_FILE="/scratch/ely67071/sunflower_data/RM_non_zero_exit_codes.txt"
 
 lines=$(cat $LOG_FILE)
 

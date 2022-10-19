@@ -1,6 +1,21 @@
 #!/bin/bash
 
+# read in the STAR module
+ml STAR/2.7.10a-GCC-8.3.0
+
 set -o pipefail
+
+# arrayID (minimum for slurm is zero)
+if [[ "${QUEUE}" == "Slurm" ]]; then
+	PBS_ARRAYID=$((SLURM_ARRAY_TASK_ID+1))
+
+        # write Job IDs to a text file that will be used to keep track of exit codes
+        echo "${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}" >> ${RM_JOB_LOG}
+	echo "Processing array ${SLURM_ARRAY_TASK_ID} corresponding to line/file # ${PBS_ARRAYID}"
+else
+	echo "Processing array ${PBS_ARRAYID} through PBS queuing system"
+fi
+
 
 # Get input file (from directory or list)
 if [[ -d "$RM_INPUT" ]]; then #if input is a DIRECTORY
@@ -48,10 +63,16 @@ else
 	echo "Output Genomic Alignments will be unsorted SAM files"
 fi
 
+if [[ "${QUEUE}" == "Slurm" ]]; then
+    STAR="STAR"
+elif [[ "${QUEUE}" == "PBS" ]]; then
+    STAR="${STAR_FILE}"
+fi
+
 ###STAR mapping
 if [[ "$RM_PASS" == "first" ]]; then ###first pass mode
 	echo "In first pass Mode"
-	${STAR_FILE} \
+	STAR\
 	--runThreadN $RM_NTHREAD \
 	--genomeDir $GEN_DIR \
 	--readFilesIn $f1 $f2 \
@@ -72,7 +93,7 @@ elif [[ "$RM_PASS" == "second" ]]; then ###second pass mode
 	if [[ ! -z "$JUNCTIONS" ]]; then ### if using junctions
 		echo "In second pass mode using $NUM_JUNCTIONS junction files"
 		echo "Junctions are as follows: $JUNCTIONS"
-		${STAR_FILE} \
+		STAR\
 		--runThreadN $RM_NTHREAD \
 		--genomeDir $GEN_DIR \
 		--readFilesIn $f1 $f2 \
@@ -92,7 +113,7 @@ elif [[ "$RM_PASS" == "second" ]]; then ###second pass mode
 		--sjdbFileChrStartEnd $JUNCTIONS
 	else
 		echo "Mapping without incorporating un-annotated junctions"
-		${STAR_FILE} \
+		STAR\
 		--runThreadN $RM_NTHREAD \
 		--genomeDir $GEN_DIR \
 		--readFilesIn $f1 $f2 \

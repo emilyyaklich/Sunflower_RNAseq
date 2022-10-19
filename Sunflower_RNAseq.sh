@@ -72,7 +72,13 @@ case "${ROUTINE}" in
         ;;
     3 | Genome_Index)
         echo "$(basename $0): Generating a genome index from ${ANNOTATION_FORMAT} annotation..." >&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Genome_Index.sh" | qsub -l "${GI_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Genome_Index
+        if [[ "$QUEUE" == "PBS" ]]; then
+            echo "PBS is our workload manager/job scheduler."
+            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Genome_Index.sh" | qsub -l "${GI_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Genome_Index
+        elif [[ "${QUEUE}" == "Slurm" ]]; then
+            echo "Slurm is our workload manager/job scheduler."
+            sbatch --job-name=${PROJECT}_Genome_Index ${GI_SBATCH} --output=${ERROR}/GI_slurm-%j.out --export=QUEUE=${QUEUE},ANNOTATION_FORMAT=${ANNOTATION_FORMAT},GENE_PARENT=${GENE_PARENT},STAR_FILE=${STAR_FILE},NTHREAD=${NTHREAD},GEN_DIR=${GEN_DIR},GEN_FASTA=${GEN_FASTA},TRANSCRIPT_TAG=${TRANSCRIPT_TAG},GENE_TAG=${GENE_TAG},GEN_ANN=${GEN_ANN},SPLICE_JUN=${SPLICE_JUN} ${SUNFLOWER_RNASEQ}/Genome_Index.sh
+            fi
         ;;
     4 | Collect_Junctions)
         if [[ ! -d "$GEN_DIR" ]]; then #if genome directory is not specified
@@ -107,12 +113,35 @@ case "${ROUTINE}" in
             exit 1
         fi
         echo "Max array index is ${Maxarray}">&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Collect_Junctions -V -t 1-"${Maxarray}"
-        ;;
+        if [[ "$QUEUE" == "PBS" ]]; then
+            echo "PBS is our workload manager/job scheduler."
+            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Collect_Junctions -V -t 1-"${Maxarray}"
+        elif [[ "${QUEUE}" == "Slurm" ]]; then
+            echo "Slurm is our workload manager/job scheduler."
+            Slurm_Maxarray=$(($Maxarray-1))
+	    sbatch --job-name=${PROJECT}_Collect_Junctions ${RM_SBATCH} --output=${ERROR}/CJ_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},CJ_JOB_LOG=${CJ_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},CJ_OUTPUTDIR=${CJ_OUTPUTDIR},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${SUNFLOWER_RNASEQ}/Read_Mapping.sh
+        else
+                echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
+                exit 1
+        fi
+
+
+
+;;
     5 | Filter_Junctions)
         echo "$(basename $0): Filtering and concatenating junctions for mapping..." >&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Filter_Junctions.sh" | qsub -l "${FJ_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Filter_Junctions
-        ;;
+        if [[ "$QUEUE" == "PBS" ]]; then
+            echo "PBS is our workload manager/job scheduler."
+            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Filter_Junctions.sh" | qsub -l "${FJ_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Filter_Junctions
+        elif [[ "${QUEUE}" == "Slurm" ]]; then
+                echo "Slurm is our workload manager/job scheduler."
+                sbatch --job-name=${PROJECT}_Filter_Junctions ${FJ_SBATCH} --output=${ERROR}/FJ_slurm-%j.out --export=JUNCTIONDIR=${JUNCTIONDIR},SJ_LISTNAME=${SJ_LISTNAME},SCAFFOLD_STRING=${SCAFFOLD_STRING},REMOVE_NC_JUNK=${REMOVE_NC_JUNK},UNIQUE_NUM=${UNIQUE_NUM} ${SUNFLOWER_RNASEQ}/Filter_Junctions.sh
+            else
+                echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
+                exit 1
+fi
+
+;;
     6 | Read_Mapping)
         if [[ ! -d "$GEN_DIR" ]]; then #if genome directory is not specified
             echo "Please specify a valid filepath to the genome directory, exiting..."
@@ -166,8 +195,20 @@ case "${ROUTINE}" in
             exit 1
         fi
         echo "Max array index is ${Maxarray}">&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Read_Mapping -V -t 1-"${Maxarray}"
-        ;;
+        if [[ "$QUEUE" == "PBS" ]]; then
+            echo "PBS is our workload manager/job scheduler."
+
+            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Read_Mapping -V -t 1-"${Maxarray}"
+       
+        elif [[ "${QUEUE}" == "Slurm" ]]; then
+            echo "Slurm is our workload manager/job scheduler."
+            Slurm_Maxarray=$(($Maxarray-1))
+            sbatch --job-name=${PROJECT}_Read_Mapping ${RM_SBATCH} --output=${ERROR}/RM_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},RM_JOB_LOG=${RM_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},RM_OUTPUTDIR=${RM_OUTPUTDIR},QUANT=${QUANT},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${SUNFLOWER_RNASEQ}/Read_Mapping.sh
+fi
+
+
+
+ ;;
     7 | Merge_BAM)
         echo "$(basename $0): Merging BAM files..." >&2
         if [[ -f "$ID_NAMES" ]]; then
