@@ -214,7 +214,13 @@ fi
         if [[ -f "$ID_NAMES" ]]; then
             Maxarray=$(cat $ID_NAMES | wc -l)
             echo "Max array index is ${Maxarray}" >&2
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Merge_BAM.sh" | qsub -l "${MB_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Merge_BAM -t 1-"${Maxarray}"
+            if [[ "$QUEUE" == "PBS" ]]; then
+                echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Merge_BAM.sh" | qsub -l "${MB_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Merge_BAM -t 1-"${Maxarray}"
+            elif [[ "${QUEUE}" == "Slurm" ]]; then
+                echo "Slurm is our workload manager/job scheduler."
+                Slurm_Maxarray=$(($Maxarray-1))
+                sbatch --job-name=${PROJECT}_merge_BAM ${MB_SBATCH} --output=${ERROR}/MB_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},MB_INPUTDIR=${MB_INPUTDIR},MB_JOB_LOG=${MB_JOB_LOG},ID_NAMES=${ID_NAMES},MB_OUTPUTDIR=${MB_OUTPUTDIR} ${SUNFLOWER_RNASEQ}/Merge_BAM.sh
+fi
         else
             echo "Please specify a valid file containing a list of ID names in the Config file"
         fi
