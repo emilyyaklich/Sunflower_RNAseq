@@ -92,6 +92,7 @@ AT_OUTPUTDIR="/scratch/ely67071/sunflower_data/trimmed_reads/Plate3/Run4/FASTQ_G
 ADAPTERFILE="/scratch/ely67071/sunflower_data/illumina_adapters.txt"
 
 #       File name/path of where JOB IDs should be recorded
+#       This needs to be created BEFORE running the script (i.e. touch scratch/ely67071/sunflower_data/AT_job_log.txt)
 AT_JOB_LOG="/scratch/ely67071/sunflower_data/AT_job_log.txt"
 
 #   What shared suffix do the forward samples have?

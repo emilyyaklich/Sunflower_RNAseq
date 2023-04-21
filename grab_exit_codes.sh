@@ -10,6 +10,7 @@
 #SBATCH --mail-user=ely67071@uga.edu
 #SBATCH --mail-type=ALL
 
+
 # read in the file where all JOBs and task IDs were recorded (output from Adapter Trimming section of pipeline; Trimm.sh)
 LOG_FILE="/scratch/ely67071/sunflower_data/RM_job_log_2nd_pass.txt"
 # name the output file that will contain the exit codes
